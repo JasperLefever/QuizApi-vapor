@@ -26,5 +26,13 @@ struct CategoryController: RouteCollection {
         try await category.save(on: req.db)
         return category
     }
+    
+    func delete(req: Request) async throws -> HTTPStatus {
+        guard let category = try await Category.find(req.parameters.get("catId"), on: req.db) else {
+            throw Abort(.notFound)
+        }
+        try await category.delete(on: req.db)
+        return .noContent
+    }
 
 }
