@@ -31,9 +31,8 @@ final class Question: Model, Content {
     self.$category.id = categoryID
   }
 
-  init(questionText: String, category: Category, answers: [Answer]) {
+  init(questionText: String, category: Category) {
     self.questionText = questionText
     self.$category.id = category.id!
-    self.$answers.value = answers
   }
 }
