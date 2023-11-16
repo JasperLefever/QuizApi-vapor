@@ -6,8 +6,8 @@ struct PageResult<T: Content>: Content {
 }
 
 struct PageRequest: Content {
-  var page: Int
-  var perPage: Int
+  var page: Int?
+  var perPage: Int?
 }
 
 struct PageMetadata: Content {

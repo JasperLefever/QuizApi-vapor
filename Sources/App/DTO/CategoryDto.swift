@@ -4,4 +4,10 @@ struct CategoryResult: Content {
   var id: UUID?
   var name: String
   var icon: String
+
+  init(category: Category) {
+    self.id = category.id
+    self.name = category.name
+    self.icon = category.icon
+  }
 }

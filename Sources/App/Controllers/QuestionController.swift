@@ -14,18 +14,29 @@ struct QuestionController: RouteCollection {
 
     questions.get(use: getAll)
     questions.post(use: create)
+    questions.delete(":questionId", use: delete)
 
   }
 
-  func getAll(req: Request) async throws -> Page<Question> {
-
-    return try await Question.query(on: req.db)
+  func getAll(req: Request) async throws -> Page<QuestionResult> {
+    let pageReq = try req.query.decode(PageRequest.self)
+    let page = try await Question.query(on: req.db)
       .with(\.$answers)
       .with(\.$category)
-      .paginate(FluentKit.PageRequest(page: 1, per: 2))
+      .paginate(
+        FluentKit.PageRequest(
+          page: pageReq.page ?? 1,
+          per: pageReq.perPage ?? 10
+        )
+      )
+
+    let questions = page.items.map { QuestionResult(question: $0) }
+    let questionPage = Page(items: questions, metadata: page.metadata)
+
+    return questionPage
   }
 
-  func create(req: Request) async throws -> Question {
+  func create(req: Request) async throws -> QuestionResult {
     let questionReq = try req.content.decode(CreateQuestionRequest.self)
     guard let category = try await Category.find(questionReq.categoryId, on: req.db) else {
       throw Abort(.notFound)
@@ -45,10 +56,12 @@ struct QuestionController: RouteCollection {
       try await answer.save(on: req.db)
     }
 
-    return try await Question.query(on: req.db)
+    let res = try await Question.query(on: req.db)
       .with(\.$answers)
+      .with(\.$category)
       .filter(\.$id == question.id!)
       .first()!
+    return QuestionResult(question: res)
   }
 
   func delete(req: Request) async throws -> HTTPStatus {
