@@ -14,11 +14,28 @@ struct CategoryController: RouteCollection {
 
     categories.get(use: getAll)
     categories.post(use: create)
+    categories.delete(":catId", use: delete)
 
   }
 
-  func getAll(req: Request) async throws -> [Category] {
-    return try await Category.query(on: req.db).all()
+  func getAll(req: Request) async throws -> Page<Category> {
+    let pageReq = try req.query.decode(PageRequest.self)
+    return try await Category.query(on: req.db)
+      .paginate(
+        FluentKit.PageRequest(
+          page: pageReq.page ?? 1,
+          per: pageReq.perPage ?? 10
+        )
+      )
+  }
+
+  func getCountPerCategory(req: Request) async throws -> Int {
+    guard let category = try await Category.find(req.parameters.get("catId"), on: req.db) else {
+      throw Abort(.notFound)
+    }
+    return try await Question.query(on: req.db)
+      .filter(\.$category.$id == category.id!)
+      .count()
   }
 
   func create(req: Request) async throws -> Category {
