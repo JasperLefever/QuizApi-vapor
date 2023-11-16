@@ -7,3 +7,24 @@
 
 import Vapor
 import Fluent
+
+final class Category: Model, Content {
+    static let schema = "categories"
+    
+    @ID(key: .id)
+    var id: UUID?
+
+    @Field(key: "name")
+    var name: String
+    
+    @Field(key: "icon")
+    var icon: String
+    
+    init() { }
+
+    init(id: UUID? = nil, name: String, icon: String) {
+        self.id = id
+        self.name = name
+        self.icon = icon
+    }
+}
