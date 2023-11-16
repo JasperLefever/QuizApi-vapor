@@ -17,11 +17,12 @@ struct QuestionController: RouteCollection {
 
   }
 
-  func getAll(req: Request) async throws -> [Question] {
+  func getAll(req: Request) async throws -> Page<Question> {
+
     return try await Question.query(on: req.db)
       .with(\.$answers)
       .with(\.$category)
-      .all()
+      .paginate(FluentKit.PageRequest(page: 1, per: 2))
   }
 
   func create(req: Request) async throws -> Question {
