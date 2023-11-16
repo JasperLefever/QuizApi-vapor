@@ -9,13 +9,14 @@ import Fluent
 
 struct CreateCategory: AsyncMigration {
     func prepare(on database: Database) async throws {
-        try await database.schema("todos")
+        try await database.schema(Category.schema)
             .id()
-            .field("title", .string, .required)
+            .field("name", .string, .required)
+            .field("icon", .string, .required)
             .create()
     }
 
     func revert(on database: Database) async throws {
-        try await database.schema("todos").delete()
+        try await database.schema(Category.schema).delete()
     }
 }
