@@ -13,6 +13,7 @@ struct QuestionController: RouteCollection {
     let questions = routes.grouped("questions")
 
     questions.get(use: getAll)
+    questions.get("category", ":categoryId", use: getAllCategory)
     questions.post(use: create)
     questions.delete(":questionId", use: delete)
 
@@ -23,6 +24,25 @@ struct QuestionController: RouteCollection {
     let page = try await Question.query(on: req.db)
       .with(\.$answers)
       .with(\.$category)
+      .paginate(
+        FluentKit.PageRequest(
+          page: pageReq.page ?? 1,
+          per: pageReq.perPage ?? 10
+        )
+      )
+
+    let questions = page.items.map { QuestionResult(question: $0) }
+    let questionPage = Page(items: questions, metadata: page.metadata)
+
+    return questionPage
+  }
+
+  func getAllCategory(req: Request) async throws -> Page<QuestionResult> {
+    let pageReq = try req.query.decode(PageRequest.self)
+    let page = try await Question.query(on: req.db)
+      .with(\.$answers)
+      .with(\.$category)
+      .filter(\.$category.$id == req.parameters.get("categoryId", as: UUID.self)!)
       .paginate(
         FluentKit.PageRequest(
           page: pageReq.page ?? 1,
