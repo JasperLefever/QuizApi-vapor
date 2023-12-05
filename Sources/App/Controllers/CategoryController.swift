@@ -13,6 +13,7 @@ struct CategoryController: RouteCollection {
     let categories = routes.grouped("categories")
 
     categories.get(use: getAll)
+    categories.get(":catId", "count", use: getCountPerCategory)
     categories.post(use: create)
     categories.delete(":catId", use: delete)
 
