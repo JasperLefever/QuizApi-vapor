@@ -20,6 +20,9 @@ final class Category: Model, Content {
     @Field(key: "icon")
     var icon: String
     
+    @Children(for: \.$category)
+    var questions: [Question]
+    
     init() { }
 
     init(id: UUID? = nil, name: String, icon: String) {

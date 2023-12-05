@@ -19,16 +19,28 @@ struct CategoryController: RouteCollection {
 
   }
 
-  func getAll(req: Request) async throws -> Page<Category> {
-    let pageReq = try req.query.decode(PageRequest.self)
-    return try await Category.query(on: req.db)
-      .paginate(
-        FluentKit.PageRequest(
-          page: pageReq.page ?? 1,
-          per: pageReq.perPage ?? 10
-        )
-      )
-  }
+    func getAll(req: Request) async throws -> Page<CategoryWithCount> {
+        let pageReq = try req.query.decode(PageRequest.self)
+        let categories = try await Category.query(on: req.db)
+            .with(\.$questions)
+            .paginate(
+                FluentKit.PageRequest(
+                    page: pageReq.page ?? 1,
+                    per: pageReq.perPage ?? 10
+                )
+            )
+
+        let categoriesWithCount = categories.items.map { category in
+            return CategoryWithCount(
+                id: category.id!,
+                name: category.name,
+                icon: category.icon,
+                questionCount: category.questions.count
+            )
+        }
+
+        return Page(items: categoriesWithCount, metadata: categories.metadata)
+    }
 
   func getCountPerCategory(req: Request) async throws -> Int {
     guard let category = try await Category.find(req.parameters.get("catId"), on: req.db) else {
