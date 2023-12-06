@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Jasper Lefever on 16/11/2023.
 //
@@ -15,7 +15,7 @@ struct CreateCategory: AsyncMigration {
             .field("icon", .string, .required)
             .create()
     }
-
+    
     func revert(on database: Database) async throws {
         try await database.schema(Category.schema).delete()
     }

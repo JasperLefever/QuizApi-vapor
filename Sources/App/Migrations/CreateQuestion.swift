@@ -12,7 +12,7 @@ struct CreateQuestion: AsyncMigration {
     try await database.schema(Question.schema)
       .id()
       .field("question_text", .string, .required)
-      .field("category_id", .uuid, .required, .references(Category.schema, "id"))
+      .field("category_id", .uuid, .required, .references(Category.schema, "id", onDelete: .cascade))
       .create()
   }
 

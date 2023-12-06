@@ -58,7 +58,7 @@ struct CategoryController: RouteCollection {
   }
 
   func delete(req: Request) async throws -> HTTPStatus {
-    guard let category = try await Category.find(req.parameters.get("catId"), on: req.db) else {
+      guard let category = try await Category.find(req.parameters.get("catId"), on: req.db) else {
       throw Abort(.notFound)
     }
     try await category.delete(on: req.db)
