@@ -6,6 +6,8 @@ Quiz api made with Vapor framework and Fuent ORM
 - run the migrations: `swift run App migrate`
 - Run the application `swift run App serve`
 
+MAKE SURE TO CHECK THE RUN SCHEME -> EDIT SCHEME -> RUN -> OPTIONS -> USE CUSTOM WORKING DIRECTORY -> SET TO PROJECT ROOT
+
 ## API Documentation
 
 ### Endpoints
